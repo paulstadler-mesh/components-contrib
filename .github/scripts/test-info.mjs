@@ -294,6 +294,12 @@ const components = {
     'crypto.jwks': {
         conformance: true,
     },
+    'lock.kubernetes': {
+        conformance: true,
+        requireKind: true,
+        conformanceSetup: 'conformance-lock.kubernetes-setup.sh',
+        sourcePkg: ['lock/kubernetes'],
+    },
     'lock.redis.v6': {
         conformance: true,
         conformanceSetup: 'docker-compose.sh redisjson redis',

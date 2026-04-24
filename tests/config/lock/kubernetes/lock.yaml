@@ -1,0 +1,10 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: lockstore
+spec:
+  type: lock.kubernetes
+  version: v1
+  metadata:
+  - name: namespace
+    value: "default"

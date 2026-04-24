@@ -1,0 +1,60 @@
+# yaml-language-server: $schema=../../component-metadata-schema.json
+schemaVersion: v1
+type: lock
+name: kubernetes
+version: v1
+status: alpha
+title: "Kubernetes Lease Distributed Lock"
+description: |
+  Distributed lock backed by Kubernetes coordination.k8s.io/v1 Lease
+  resources. Each ResourceID maps to a Lease; acquisition creates or takes
+  over the Lease, and release deletes it. Lock expiry is enforced by the
+  apiserver-supplied renewTime plus leaseDurationSeconds.
+
+  Caveats:
+    - The pod running Dapr must have RBAC permissions to
+      get/create/update/delete leases.coordination.k8s.io in the target
+      namespace.
+    - ResourceIDs are hashed to produce valid DNS-1123 Lease names. The
+      original ResourceID is stored as an annotation
+      (dapr.io/lock-resource-id) for operator visibility.
+    - Each TryLock/Unlock is a round-trip to the kube-apiserver. Suitable
+      for coordination (leader election, singleton jobs), not for
+      high-frequency locking.
+    - ExpiryInSeconds should be larger than the expected apiserver
+      round-trip time to avoid races with renewal.
+urls:
+  - title: Reference
+    url: https://docs.dapr.io/reference/components-reference/supported-locks/
+lock:
+  operations:
+    - name: tryLock
+      description: "Attempt to acquire a distributed lock by creating or taking over a Lease."
+    - name: unlock
+      description: "Release a distributed lock by deleting the backing Lease."
+metadata:
+  - name: namespace
+    required: false
+    description: |
+      Namespace in which Lease objects are created and managed. If unset,
+      the NAMESPACE environment variable is used (commonly set via the
+      downward API in Dapr deployments). One of the two must be provided.
+    example: '"default"'
+    type: string
+  - name: kubeconfigPath
+    required: false
+    description: |
+      Path to a kubeconfig file. When empty, the component first attempts
+      in-cluster configuration and falls back to the default kubeconfig
+      location (~/.kube/config).
+    example: '"/home/user/.kube/config"'
+    type: string
+  - name: leaseNamePrefix
+    required: false
+    description: |
+      Prefix prepended to the hashed ResourceID when naming Lease objects.
+      Must be a valid DNS-1123 subdomain prefix (lowercase alphanumerics
+      and hyphens).
+    example: '"dapr-lock-"'
+    default: '"dapr-lock-"'
+    type: string

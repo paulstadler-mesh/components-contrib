@@ -23,6 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/dapr/components-contrib/lock"
+	l_kubernetes "github.com/dapr/components-contrib/lock/kubernetes"
 	l_redis "github.com/dapr/components-contrib/lock/redis"
 	conf_lock "github.com/dapr/components-contrib/tests/conformance/lock"
 )
@@ -60,6 +61,8 @@ func loadLockStore(name string) lock.Store {
 		return l_redis.NewStandaloneRedisLock(testLogger)
 	case "redis.v7":
 		return l_redis.NewStandaloneRedisLock(testLogger)
+	case "kubernetes":
+		return l_kubernetes.NewKubernetesLock(testLogger)
 	default:
 		return nil
 	}
